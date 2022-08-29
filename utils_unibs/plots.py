@@ -471,7 +471,7 @@ def get_hist_plot(
         if not save_fig.endswith(".png"):
             save_fig += ".png"
         plt.savefig(save_fig, bbox_inches="tight")
-    plt.show(fig)
+    plt.show()
     plt.close(fig)
 
 
