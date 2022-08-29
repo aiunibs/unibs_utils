@@ -345,7 +345,8 @@ def _line_plot(
 
 def get_line_plot(
     dataset: list,
-    x: list,
+    xticks: list = [],
+    xticks_labels: list = None,
     labels: list = None,
     xlabel: str = None,
     ylabel: str = None,
@@ -361,7 +362,8 @@ def get_line_plot(
 
     Args:
         dataset: a ndarray containing the data to plot divided by rows
-        x: a ndarray containing the X axis labels
+        xticks:  a ndarray of integers containing the X axis ticks positions; default is None
+        xticks_labels: a list of X axis labels, default is None
         labels: a list containing the labels for the dataset
         xlabel: a string containing the label of the X axis; default is None
         ylabel: a string containing the label of the Y axis; default is None
@@ -379,10 +381,19 @@ def get_line_plot(
     """
 
     dataset = np.asanyarray(dataset)
-    fig, ax = plt.subplots()
+    if xticks is None:
+        xticks = []
+    fig, ax = plt.subplots(facecolor='w')
     if len(dataset.shape) == 2:
-        fig, ax = _line_plot(dataset, x, fig, ax, labels, styles, markers, colors)
-        ax.set_xticks(x)
+        x_axis = range(dataset.shape[1])
+        fig, ax = _line_plot(dataset, x_axis, fig, ax, labels, styles, markers, colors)
+        if xticks_labels is None:
+            ax.set_xticks(xticks)
+        elif len(xticks_labels) != len(xticks):
+            warnings.warn('Aaaaaaa')
+            ax.set_xticks(xticks)
+        else:
+            ax.set_xticks(xticks, xticks_labels)
         # for value in x:
         #    ax.axvline(value, color='#000', linestyle='dotted', alpha=0.3)
         ax.set_xlabel(xlabel)
@@ -405,22 +416,26 @@ def get_line_plot(
 
 
 def get_hist_plot(
-    dataset: list,
-    x: list,
-    labels: list = None,
-    xlabel: str = None,
-    ylabel: str = None,
-    legend_title: str = None,
-    title: str = None,
-    save_fig: str = None,
-    colors: list = C.COLORS,
+        dataset: list,
+        xticks: list = None,
+        xticks_labels: list = None,
+        labels: list = None,
+        xlabel: str = None,
+        ylabel: str = None,
+        legend_title: str = None,
+        title: str = None,
+        save_fig: str = None,
+        eps1: float = 0.1,
+        eps2: float = 0.1,
+        colors: list = C.COLORS,
 ):
     """
     Returns a bar plot of the dataset
 
     Args:
         dataset: a ndarray containing the data to plot
-        x: a ndarray containing the X axis labels
+        xticks:  a ndarray of integers containing the X axis ticks positions; default is None
+        xticks_labels: a list of X axis labels, default is None
         labels: a list containing the labels for the dataset
         xlabel: a string containing the label of the X axis; default is None
         ylabel: a string containing the label of the Y axis; default is None
@@ -428,6 +443,8 @@ def get_hist_plot(
         title: a string containing the figure title; default is None
         save_fig: a string containing the path where to save the figure; default is None. If None the figure will
                   not be saved
+        eps1: a float that represents the space between the columns in different ticks. Must be between 0 and 0.1
+        eps2: a float that represents the space between the columns in the same tick. Must be between 0 and 0.1
         colors: a list containing pyplot colors
 
     Returns:
@@ -435,44 +452,64 @@ def get_hist_plot(
     """
 
     dataset = np.asanyarray(dataset)
-    fig, ax = plt.subplots()
-    eps = 0.05
-    eps2 = 0.025
-    w = (1 - (2 * eps + eps2)) / dataset.shape[0]
-    for i in range(dataset.shape[0]):
-        for j in range(dataset.shape[1]):
-            try:
-                if j == 0 and labels is not None:
-                    mylabel = labels[i]
-                else:
-                    raise IndexError
-            except IndexError:
-                mylabel = None
-            try:
-                color = colors[i]
-            except IndexError:
-                w_msg = C.WARNING_MSG.format(f"colors[{i}]", C.DEFAULT_COLOR)
-                warnings.warn(w_msg)
-                color = C.DEFAULT_COLOR
-            ax.bar(
-                j - 0.5 + eps + w / 2 + i * w,
-                dataset[i][j],
-                color=color,
-                width=w - eps2,
-                label=mylabel,
-            )
-    ax.set_xticks(list(range(len(x))), x)
-    if labels is not None:
-        fig.legend(bbox_to_anchor=(0.95, 0.5), loc="center left", title=legend_title)
-    ax.set_xlabel(xlabel)
-    ax.set_ylabel(ylabel)
-    ax.set_title(title)
-    if save_fig is not None:
-        if not save_fig.endswith(".png"):
-            save_fig += ".png"
-        plt.savefig(save_fig, bbox_inches="tight")
-    plt.show()
-    plt.close(fig)
+    if xticks is None:
+        xticks = []
+
+    if eps1 < 0:
+        eps1 = 0
+    elif eps1 > 0.1:
+        eps1 = 0.1
+    if eps2 < 0:
+        eps2 = 0
+    elif eps2 > 0.1:
+        eps2 = 0.1
+
+    fig, ax = plt.subplots(facecolor='w')
+    if len(dataset.shape) == 2:
+        w = (1 - (2 * eps1)) / dataset.shape[0]
+        for i in range(dataset.shape[0]):
+            for j in range(dataset.shape[1]):
+                try:
+                    if j == 0 and labels is not None:
+                        mylabel = labels[i]
+                    else:
+                        raise IndexError
+                except IndexError:
+                    mylabel = None
+                try:
+                    color = colors[i]
+                except IndexError:
+                    w_msg = C.WARNING_MSG.format(f"colors[{i}]", C.DEFAULT_COLOR)
+                    warnings.warn(w_msg)
+                    color = C.DEFAULT_COLOR
+                ax.bar(
+                    j - 0.5 + eps1 + w / 2 + i * w,
+                    dataset[i][j],
+                    color=color,
+                    width=w - eps2,
+                    label=mylabel,
+                )
+        if xticks_labels is None:
+            ax.set_xticks(xticks)
+        elif len(xticks_labels) != len(xticks):
+            warnings.warn('Aaaaaaa')
+            ax.set_xticks(xticks)
+        else:
+            ax.set_xticks(xticks, xticks_labels)
+        if labels is not None:
+            fig.legend(bbox_to_anchor=(0.95, 0.5), loc="center left", title=legend_title)
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
+        ax.set_title(title)
+        if save_fig is not None:
+            if not save_fig.endswith(".png"):
+                save_fig += ".png"
+            plt.savefig(save_fig, bbox_inches="tight")
+        plt.show()
+        plt.close(fig)
+    else:
+        print(C.DATASET_ERROR_MSG)
+    return fig, ax
 
 
 update_dimensions()
