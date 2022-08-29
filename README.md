@@ -122,7 +122,7 @@ Attempt 3 & \bf{1} & 0 & 0 & \bf{1} \\
 ```
 
 ### files
-A module for loading and saving files. Supports txt, json and pickle files
+A module for loading and saving files. Supports txt, pddl, json and pickle files
 
 #### methods:
 * `load_from_folder`: load files from a given folder

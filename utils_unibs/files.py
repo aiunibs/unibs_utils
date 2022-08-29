@@ -11,7 +11,7 @@ def _load_file(
     error: str = f"Error while loading file",
 ) -> object:
     """
-    Load single file. It handles txt, json and pickle files
+    Load single file. It handles txt, pddl, json and pickle files
 
     Args:
         read_file: string that contains the path to the file
@@ -22,10 +22,10 @@ def _load_file(
         the loaded file
     """
     try:
-        if read_file.endswith(".json") or read_file.endswith(".JSON"):
+        if read_file.lower().endswith(".json"):
             with open(read_file, "r") as rf:
                 o = json.load(rf)
-        elif read_file.endswith(".txt") or read_file.endswith(".TXT"):
+        elif read_file.lower().endswith(".txt") or read_file.lower().endswith('.pddl'):
             with open(read_file, "r") as rf:
                 o = rf.readlines()
         else:
@@ -41,7 +41,7 @@ def _load_file(
 
 def load_from_folder(read_dir: str, files: list) -> list:
     """
-    Load files from a given folder. Supports txt, json and pickle files.
+    Load files from a given folder. Supports txt, pddl, json and pickle files.
 
     Args:
         read_dir: a string that contains the path to a folder
