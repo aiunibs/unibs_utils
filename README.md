@@ -2,7 +2,13 @@
 ## Description
 A python package that contains utility function on plots, tables and file management.
 
-## Moules:
+## Install Instructions
+To install this python package run this command in your command line:
+```shell
+$ python setup.py install
+```
+
+## Modules
 ### plots
 
 A module for creating customized plots from a dataset
