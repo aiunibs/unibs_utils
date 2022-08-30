@@ -64,7 +64,8 @@ up.set_size("small", 13)
 
 fig, ax = up.get_line_plot(
     dataset=dataset,
-    x=["$T_0$", "$T_1$", "$T_2$", "$T_3$"],
+    xticks=range(4),
+    xticks_labels=["$T_0$", "$T_1$", "$T_2$", "$T_3$"],
     labels=labels,
     xlabel="Time",
     ylabel="Value",
