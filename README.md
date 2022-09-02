@@ -113,13 +113,14 @@ print(
         axis=C.ROW,
         count_vals=2,
         precision=0,
+        hline=2
     )
 )
 ```
 ```
-Attempt 1 & \bf{5} & 4 & 2 & \bf{3} \\
-Attempt 2 & \bf{9} & 6 & \bf{9} & 6 \\
-Attempt 3 & \bf{1} & 0 & 0 & \bf{1} \\
+Attempt 1 & \bf{5} & 4 & 2 & \bf{3} \\ 
+Attempt 2 & \bf{9} & 6 & \bf{9} & 6 \\ \hline
+Attempt 3 & \bf{1} & 0 & 0 & \bf{1} \\ 
 ```
 
 ### files

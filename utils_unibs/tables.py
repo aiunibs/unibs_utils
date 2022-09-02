@@ -26,7 +26,7 @@ def get_idxs(position: int, count_vals: int):
 
 
 def print_latex_table(
-    dataset: list, labels: list = None, best=-1, axis: int = 0, count_vals: int = -1, precision: int = 1
+    dataset: list, labels: list = None, best=-1, axis: int = 0, count_vals: int = -1, precision: int = 1, hline: int = 0
 ):
     """
     Creates a latex table of a given dataset
@@ -39,6 +39,7 @@ def print_latex_table(
         count_vals: An integer representing the length of the interval within which to compute the best value.
                     Value -1 represents the whole axis.
         precision: an int that contains the float precision. Default is 1
+        hline: an int that contains the number of rows after which to put an horizontal line. Default is 0
 
     Returns:
         A string that contains the latex body of the given dataset
@@ -89,12 +90,14 @@ def print_latex_table(
             s += " & "
         s = s[:-2]
         s += r"\\"
+        if hline > 0 and i%hline == hline-1:
+            s += '\hline'
         s += "\n"
     return s
 
 
 def create_table(
-    title: str, headers: list, rows: list, just: int = 10, precision: int = 2
+    title: str, headers: list, rows: list, just: int = 10, precision: int = 2, hline: int = 0
 ) -> list:
     """
     Create a text table that contains the given rows
