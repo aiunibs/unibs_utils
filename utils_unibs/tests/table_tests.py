@@ -18,8 +18,9 @@ class TestGetID(unittest.TestCase):
 class TestPrintLatexTable(unittest.TestCase):
 
     x = [[1, 2, 3], [1, 2, 3]]
-    x1 = [[1, 2, 'c'], ['1', 'b', 4]]
+    x_string = [[1, 2, "c"], ["1%", "b", 4]]
     labels = ["a", "b"]
+    labels_special = ["a>b", "a & b ~ c"]
 
     def test_correct(self):
         sol = " & 1 & 2 & 3 \\\\\\hline\n & 1 & 2 & 3 \\\\\\hline\n"
@@ -48,15 +49,41 @@ class TestPrintLatexTable(unittest.TestCase):
         self.assertEqual(
             print_latex_table(dataset=self.x, best=0, axis=0, precision=0), sol
         )
-        self.assertEqual(print_latex_table(dataset=self.x, precision=0, best=0, axis=0, count_vals=-1), sol)
-        self.assertEqual(print_latex_table(dataset=self.x, precision=0, best=0, axis=0, count_vals=0), sol)
+        self.assertEqual(
+            print_latex_table(
+                dataset=self.x, precision=0, best=0, axis=0, count_vals=-1
+            ),
+            sol,
+        )
+        self.assertEqual(
+            print_latex_table(
+                dataset=self.x, precision=0, best=0, axis=0, count_vals=0
+            ),
+            sol,
+        )
         sol = "a & 1 & 2 & 3 \\\\\nb & 1 & 2 & 3 \\\\\n"
         self.assertEqual(
             print_latex_table(dataset=self.x, precision=0, hline=0, labels=self.labels),
             sol,
         )
-        sol = ' & 1 & 2 & c \\\\\n & 1 & b & 4 \\\\\n'
-        self.assertEqual(print_latex_table(dataset=self.x1, precision=0), sol)
-        self.assertEqual(print_latex_table(dataset=self.x1, precision=0, best=0, axis=0, count_vals=0), sol)
-        self.assertEqual(print_latex_table(dataset=self.x1, precision=0, best=1, axis=C.ROW, count_vals=2), sol)
-
+        sol = " & 1 & 2 & c \\\\\n & 1\\% & b & 4 \\\\\n"
+        self.assertEqual(print_latex_table(dataset=self.x_string, precision=0), sol)
+        self.assertEqual(
+            print_latex_table(
+                dataset=self.x_string, precision=0, best=0, axis=0, count_vals=0
+            ),
+            sol,
+        )
+        self.assertEqual(
+            print_latex_table(
+                dataset=self.x_string, precision=0, best=1, axis=C.ROW, count_vals=2
+            ),
+            sol,
+        )
+        sol = "a\\textgreater{}b & 1 & 2 & c \\\\\na \\& b \\textasciitilde{} c & 1\\% & b & 4 \\\\\n"
+        self.assertEqual(
+            print_latex_table(
+                dataset=self.x_string, precision=0, labels=self.labels_special
+            ),
+            sol,
+        )

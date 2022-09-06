@@ -1,5 +1,6 @@
 from utils_unibs.constants import C
 import numpy as np
+import re
 
 
 def get_idxs(position: int, count_vals: int):
@@ -25,17 +26,56 @@ def get_idxs(position: int, count_vals: int):
     return prev_idx, next_idx
 
 
+def _tex_escape(text):
+    """
+    Source: https://stackoverflow.com/questions/16259923/how-can-i-escape-latex-special-characters-inside-django-templates
+
+    Args:
+        text: a plain text message
+
+    Returns:
+        the message escaped to appear correctly in LaTeX
+    """
+    conv = {
+        "&": r"\&",
+        "%": r"\%",
+        "$": r"\$",
+        "#": r"\#",
+        "_": r"\_",
+        "{": r"\{",
+        "}": r"\}",
+        "~": r"\textasciitilde{}",
+        "^": r"\^{}",
+        "\\": r"\textbackslash{}",
+        "<": r"\textless{}",
+        ">": r"\textgreater{}",
+    }
+    regex = re.compile(
+        "|".join(
+            re.escape(str(key))
+            for key in sorted(conv.keys(), key=lambda item: -len(item))
+        )
+    )
+    return regex.sub(lambda match: conv[match.group()], text)
+
+
 def _get_formatted_element(el: object, precision: int = 1):
     try:
         f = float(el)
         return f"{f:.{precision}f}"
     except ValueError:
         s = str(el)
-        return f'{s}'
+        return f"{_tex_escape(s)}"
 
 
 def print_latex_table(
-    dataset: list, labels: list = None, best=-1, axis: int = 0, count_vals: int = -1, precision: int = 1, hline: int = 0
+    dataset: list,
+    labels: list = None,
+    best=-1,
+    axis: int = 0,
+    count_vals: int = -1,
+    precision: int = 1,
+    hline: int = 0,
 ):
     """
     Creates a latex table of a given dataset
@@ -103,14 +143,15 @@ def print_latex_table(
             s += " & "
         s = s[:-2]
         s += r"\\"
-        if hline > 0 and i%hline == hline-1:
-            s += '\hline'
+        if hline > 0 and i % hline == hline - 1:
+            s += "\hline"
         s += "\n"
     return s
 
 
 def print_text_table(
-    title: str, headers: list, rows: list, just: int = 10, precision: int = 2) -> list:
+    title: str, headers: list, rows: list, just: int = 10, precision: int = 2
+) -> list:
     """
     Create a text table that contains the given rows
 
