@@ -25,6 +25,15 @@ def get_idxs(position: int, count_vals: int):
     return prev_idx, next_idx
 
 
+def _get_formatted_element(el: object, precision: int = 1):
+    try:
+        f = float(el)
+        return f"{f:.{precision}f}"
+    except ValueError:
+        s = str(el)
+        return f'{s}'
+
+
 def print_latex_table(
     dataset: list, labels: list = None, best=-1, axis: int = 0, count_vals: int = -1, precision: int = 1, hline: int = 0
 ):
@@ -59,30 +68,34 @@ def print_latex_table(
 
         try:
             if labels is not None:
-                s += f"{labels[i]} & "
+                s += _get_formatted_element(labels[i])
             else:
                 raise IndexError
         except IndexError:
-            s += " & "
+            pass
+        s += " & "
 
         for j, el in enumerate(r):
-            if best == 0 or best == 1:
-                if axis == C.COLUMN:
-                    prev_idx, next_idx = get_idxs(i, count_vals)
-                    max_idxs = np.where(
-                        table[:, j] == function(table[prev_idx:next_idx, j])
-                    )[0]
-                elif axis == C.ROW:
-                    prev_idx, next_idx = get_idxs(j, count_vals)
-                    max_idxs = np.where(
-                        table[i] == function(table[i, prev_idx:next_idx])
-                    )[0]
+            try:
+                if best == 0 or best == 1:
+                    if axis == C.COLUMN:
+                        prev_idx, next_idx = get_idxs(i, count_vals)
+                        max_idxs = np.where(
+                            table[:, j] == function(table[prev_idx:next_idx, j])
+                        )[0]
+                    elif axis == C.ROW:
+                        prev_idx, next_idx = get_idxs(j, count_vals)
+                        max_idxs = np.where(
+                            table[i] == function(table[i, prev_idx:next_idx])
+                        )[0]
+            except Exception as e:
+                max_idxs = []
 
             if (axis == C.COLUMN and i in max_idxs) or (
                 axis == C.ROW and j in max_idxs
             ):
                 s += r"\bf{"
-            s += f"{el:.{precision}f}"
+            s += _get_formatted_element(el, precision)
             if (axis == C.COLUMN and i in max_idxs) or (
                 axis == C.ROW and j in max_idxs
             ):
@@ -96,9 +109,8 @@ def print_latex_table(
     return s
 
 
-def create_table(
-    title: str, headers: list, rows: list, just: int = 10, precision: int = 2, hline: int = 0
-) -> list:
+def print_text_table(
+    title: str, headers: list, rows: list, just: int = 10, precision: int = 2) -> list:
     """
     Create a text table that contains the given rows
 

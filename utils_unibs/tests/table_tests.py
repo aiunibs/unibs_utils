@@ -1,5 +1,6 @@
 import unittest
 from utils_unibs.tables import get_idxs, print_latex_table
+from utils_unibs.constants import C
 
 
 class TestGetID(unittest.TestCase):
@@ -17,6 +18,7 @@ class TestGetID(unittest.TestCase):
 class TestPrintLatexTable(unittest.TestCase):
 
     x = [[1, 2, 3], [1, 2, 3]]
+    x1 = [[1, 2, 'c'], ['1', 'b', 4]]
     labels = ["a", "b"]
 
     def test_correct(self):
@@ -53,3 +55,8 @@ class TestPrintLatexTable(unittest.TestCase):
             print_latex_table(dataset=self.x, precision=0, hline=0, labels=self.labels),
             sol,
         )
+        sol = ' & 1 & 2 & c \\\\\n & 1 & b & 4 \\\\\n'
+        self.assertEqual(print_latex_table(dataset=self.x1, precision=0), sol)
+        self.assertEqual(print_latex_table(dataset=self.x1, precision=0, best=0, axis=0, count_vals=0), sol)
+        self.assertEqual(print_latex_table(dataset=self.x1, precision=0, best=1, axis=C.ROW, count_vals=2), sol)
+
