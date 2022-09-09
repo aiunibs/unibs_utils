@@ -1,5 +1,6 @@
 from utils_unibs.constants import C
 import numpy as np
+import re
 
 
 def get_idxs(position: int, count_vals: int):
@@ -25,8 +26,56 @@ def get_idxs(position: int, count_vals: int):
     return prev_idx, next_idx
 
 
+def _tex_escape(text):
+    """
+    Source: https://stackoverflow.com/questions/16259923/how-can-i-escape-latex-special-characters-inside-django-templates
+
+    Args:
+        text: a plain text message
+
+    Returns:
+        the message escaped to appear correctly in LaTeX
+    """
+    conv = {
+        "&": r"\&",
+        "%": r"\%",
+        "$": r"\$",
+        "#": r"\#",
+        "_": r"\_",
+        "{": r"\{",
+        "}": r"\}",
+        "~": r"\textasciitilde{}",
+        "^": r"\^{}",
+        "\\": r"\textbackslash{}",
+        "<": r"\textless{}",
+        ">": r"\textgreater{}",
+    }
+    regex = re.compile(
+        "|".join(
+            re.escape(str(key))
+            for key in sorted(conv.keys(), key=lambda item: -len(item))
+        )
+    )
+    return regex.sub(lambda match: conv[match.group()], text)
+
+
+def _get_formatted_element(el: object, precision: int = 1):
+    try:
+        f = float(el)
+        return f"{f:.{precision}f}"
+    except ValueError:
+        s = str(el)
+        return f"{_tex_escape(s)}"
+
+
 def print_latex_table(
-    dataset: list, labels: list = None, best=-1, axis: int = 0, count_vals: int = -1, precision: int = 1
+    dataset: list,
+    labels: list = None,
+    best=-1,
+    axis: int = 0,
+    count_vals: int = -1,
+    precision: int = 1,
+    hline: int = 0,
 ):
     """
     Creates a latex table of a given dataset
@@ -39,6 +88,7 @@ def print_latex_table(
         count_vals: An integer representing the length of the interval within which to compute the best value.
                     Value -1 represents the whole axis.
         precision: an int that contains the float precision. Default is 1
+        hline: an int that contains the number of rows after which to put an horizontal line. Default is 0
 
     Returns:
         A string that contains the latex body of the given dataset
@@ -58,30 +108,34 @@ def print_latex_table(
 
         try:
             if labels is not None:
-                s += f"{labels[i]} & "
+                s += _get_formatted_element(labels[i])
             else:
                 raise IndexError
         except IndexError:
-            s += " & "
+            pass
+        s += " & "
 
         for j, el in enumerate(r):
-            if best == 0 or best == 1:
-                if axis == C.COLUMN:
-                    prev_idx, next_idx = get_idxs(i, count_vals)
-                    max_idxs = np.where(
-                        table[:, j] == function(table[prev_idx:next_idx, j])
-                    )[0]
-                elif axis == C.ROW:
-                    prev_idx, next_idx = get_idxs(j, count_vals)
-                    max_idxs = np.where(
-                        table[i] == function(table[i, prev_idx:next_idx])
-                    )[0]
+            try:
+                if best == 0 or best == 1:
+                    if axis == C.COLUMN:
+                        prev_idx, next_idx = get_idxs(i, count_vals)
+                        max_idxs = np.where(
+                            table[:, j] == function(table[prev_idx:next_idx, j])
+                        )[0]
+                    elif axis == C.ROW:
+                        prev_idx, next_idx = get_idxs(j, count_vals)
+                        max_idxs = np.where(
+                            table[i] == function(table[i, prev_idx:next_idx])
+                        )[0]
+            except Exception as e:
+                max_idxs = []
 
             if (axis == C.COLUMN and i in max_idxs) or (
                 axis == C.ROW and j in max_idxs
             ):
                 s += r"\bf{"
-            s += f"{el:.{precision}f}"
+            s += _get_formatted_element(el, precision)
             if (axis == C.COLUMN and i in max_idxs) or (
                 axis == C.ROW and j in max_idxs
             ):
@@ -89,11 +143,13 @@ def print_latex_table(
             s += " & "
         s = s[:-2]
         s += r"\\"
+        if hline > 0 and i % hline == hline - 1:
+            s += "\hline"
         s += "\n"
     return s
 
 
-def create_table(
+def print_text_table(
     title: str, headers: list, rows: list, just: int = 10, precision: int = 2
 ) -> list:
     """

@@ -85,7 +85,7 @@ fig, ax = up.get_line_plot(
  
 #### methods:
  * `print_latex_table`: creates a latex table of a dataset
- * `create_table`: creates a text table of a dataset
+ * `print_text_table`: creates a text table of a dataset
 
 #### example
 Create a latex table of a given dataset and highlight the maximum value every two values in the same row
@@ -113,13 +113,14 @@ print(
         axis=C.ROW,
         count_vals=2,
         precision=0,
+        hline=2
     )
 )
 ```
 ```
-Attempt 1 & \bf{5} & 4 & 2 & \bf{3} \\
-Attempt 2 & \bf{9} & 6 & \bf{9} & 6 \\
-Attempt 3 & \bf{1} & 0 & 0 & \bf{1} \\
+Attempt 1 & \bf{5} & 4 & 2 & \bf{3} \\ 
+Attempt 2 & \bf{9} & 6 & \bf{9} & 6 \\ \hline
+Attempt 3 & \bf{1} & 0 & 0 & \bf{1} \\ 
 ```
 
 ### files
