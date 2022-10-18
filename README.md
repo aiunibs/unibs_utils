@@ -86,6 +86,7 @@ fig, ax = up.get_line_plot(
 #### methods:
  * `print_latex_table`: creates a latex table of a dataset
  * `print_text_table`: creates a text table of a dataset
+ * `transpose_latex_table`: transpose a latex table
 
 #### example
 Create a latex table of a given dataset and highlight the maximum value every two values in the same row
