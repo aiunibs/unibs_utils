@@ -1,5 +1,5 @@
 import unittest
-from utils_unibs.tables import get_idxs, print_latex_table
+from utils_unibs.tables import get_idxs, print_latex_table, transpose_latex_table
 from utils_unibs.constants import C
 
 
@@ -87,3 +87,25 @@ class TestPrintLatexTable(unittest.TestCase):
             ),
             sol,
         )
+
+
+class TestTranspose(unittest.TestCase):
+    s = r'''
+    \toprule
+    A & B & C \\
+    \midrule
+    1 & 2 & 3 \\
+    4 & 5 & 6 \\
+    \bottomrule
+    '''
+
+    s1 = r'''
+    1 & 2 & 3 \\
+    4 & 5 & 6 \\
+    \bottomrule
+    '''
+    def test_correct(self):
+        s_transpose = '''\\toprule\nA & 1 & 4 \\\\ \n\midrule\nB & 2 & 5 \\\\ \nC & 3 & 6 \\\\ \n\\bottomrule'''
+        self.assertEqual(transpose_latex_table(self.s), s_transpose)
+        s_transpose = '''\\toprule\n1 & 4 \\\\ \n\midrule\n2 & 5 \\\\ \n3 & 6 \\\\ \n\\bottomrule'''
+        self.assertEqual(transpose_latex_table(self.s1), s_transpose)

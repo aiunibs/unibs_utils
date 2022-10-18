@@ -189,3 +189,37 @@ def print_text_table(
         to_ret.append(s)
     to_ret.append(divider)
     return to_ret
+
+
+def transpose_latex_table(table_string: str):
+    """
+    Transpose a latex table
+
+    Args:
+        table_string (str): A latex table
+
+    Returns:
+        str: The transposed table
+    """
+    data = []
+    to_return = ""
+
+    lines = table_string.split("\n")
+    for line in lines:
+        elements = line.split("&")
+        if len(elements) > 1:
+            data.append([e.replace("\\", "").strip() for e in elements])
+    data = np.asanyarray(data)
+    data = data.T
+    for i in range(data.shape[0]):
+        if i == 0:
+            to_return += "\\toprule\n"
+        elif i == 1:
+            to_return += "\\midrule\n"
+        for j in range(data.shape[1]):
+            if j > 0:
+                to_return += " & "
+            to_return += data[i, j]
+        to_return += " \\\\ \n"
+    to_return += r"\bottomrule"
+    return to_return
