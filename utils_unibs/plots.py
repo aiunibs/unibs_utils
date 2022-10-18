@@ -343,10 +343,43 @@ def _line_plot(
     return fig, ax
 
 
+def _set_axis_ticks(ax: plt.Axes, ticks: list, labels: list, axis: str):
+    """
+    Set the ticks and labels for a given axis
+
+    Args:
+        ax (plt.Axes): the axis where to set the ticks
+        ticks (list): a list containing the ticks
+        labels (list): a list containing the labels
+        axis (str): the axis where to set the ticks ('y' or 'x')
+
+    Returns:
+        The axis with the ticks and labels set
+    """
+    if axis == C.X:
+        set_axis = ax.set_xticks
+    elif axis == C.Y:
+        set_axis = ax.set_yticks
+    else:
+        return None
+    
+    if labels is None:
+        set_axis(ticks)
+    elif len(labels) != len(ticks):
+        warnings.warn(C.TICKS_WARNING_MSG.format(axis))
+        set_axis(ticks)
+    else:
+        set_axis(ticks, labels)
+
+    return ax
+
+
 def get_line_plot(
     dataset: list,
     xticks: list = [],
     xticks_labels: list = None,
+    yticks: list = [],
+    yticks_labels: list = None,
     labels: list = None,
     xlabel: str = None,
     ylabel: str = None,
@@ -364,6 +397,8 @@ def get_line_plot(
         dataset: a ndarray containing the data to plot divided by rows
         xticks:  a ndarray of integers containing the X axis ticks positions; default is None
         xticks_labels: a list of X axis labels, default is None
+        yticks: a ndarray of integers containing the Y axis ticks positions; default is None
+        yticks_labels: a list of Y axis labels, default is None
         labels: a list containing the labels for the dataset
         xlabel: a string containing the label of the X axis; default is None
         ylabel: a string containing the label of the Y axis; default is None
@@ -383,19 +418,16 @@ def get_line_plot(
     dataset = np.asanyarray(dataset)
     if xticks is None:
         xticks = []
+    if yticks is None:
+        yticks = []
     fig, ax = plt.subplots(facecolor='w')
     if len(dataset.shape) == 2:
         x_axis = range(dataset.shape[1])
         fig, ax = _line_plot(dataset, x_axis, fig, ax, labels, styles, markers, colors)
-        if xticks_labels is None:
-            ax.set_xticks(xticks)
-        elif len(xticks_labels) != len(xticks):
-            warnings.warn('Aaaaaaa')
-            ax.set_xticks(xticks)
-        else:
-            ax.set_xticks(xticks, xticks_labels)
-        # for value in x:
-        #    ax.axvline(value, color='#000', linestyle='dotted', alpha=0.3)
+
+        ax = _set_axis_ticks(ax, xticks, xticks_labels, C.X)
+        ax = _set_axis_ticks(ax, yticks, yticks_labels, C.Y)
+
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
         ax.set_title(title)
@@ -419,6 +451,8 @@ def get_hist_plot(
         dataset: list,
         xticks: list = None,
         xticks_labels: list = None,
+        yticks: list = None,
+        yticks_labels: list = None,
         labels: list = None,
         xlabel: str = None,
         ylabel: str = None,
@@ -454,6 +488,8 @@ def get_hist_plot(
     dataset = np.asanyarray(dataset)
     if xticks is None:
         xticks = []
+    if yticks is None:
+        yticks = []
 
     if eps1 < 0:
         eps1 = 0
@@ -489,13 +525,10 @@ def get_hist_plot(
                     width=w - eps2,
                     label=mylabel,
                 )
-        if xticks_labels is None:
-            ax.set_xticks(xticks)
-        elif len(xticks_labels) != len(xticks):
-            warnings.warn('Aaaaaaa')
-            ax.set_xticks(xticks)
-        else:
-            ax.set_xticks(xticks, xticks_labels)
+        
+        ax = _set_axis_ticks(ax, xticks, xticks_labels, C.X)
+        ax = _set_axis_ticks(ax, yticks, yticks_labels, C.Y)
+
         if labels is not None:
             fig.legend(bbox_to_anchor=(0.95, 0.5), loc="center left", title=legend_title)
         ax.set_xlabel(xlabel)
