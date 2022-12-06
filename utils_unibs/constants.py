@@ -64,3 +64,8 @@ class C:
 
     X = 'x'
     Y = 'y'
+
+    NONE = 0
+    JSON = 1
+    TXT = 2
+    PICKLE = 3
