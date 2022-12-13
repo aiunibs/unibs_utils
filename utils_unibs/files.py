@@ -9,6 +9,7 @@ def _load_file(
     read_file: str,
     load_ok: str = "File loaded",
     error: str = f"Error while loading file",
+    type: int = C.NONE,
 ) -> object:
     """
     Load single file. It handles txt, pddl, json and pickle files
@@ -22,10 +23,16 @@ def _load_file(
         the loaded file
     """
     try:
-        if read_file.lower().endswith(".json"):
+        if type == C.JSON or (type == C.NONE and read_file.lower().endswith(".json")):
             with open(read_file, "r") as rf:
                 o = json.load(rf)
-        elif read_file.lower().endswith(".txt") or read_file.lower().endswith('.pddl'):
+        elif type == C.TXT or (
+            type == C.NONE
+            and (
+                read_file.lower().endswith(".txt")
+                or read_file.lower().endswith(".pddl")
+            )
+        ):
             with open(read_file, "r") as rf:
                 o = rf.readlines()
         else:
@@ -39,7 +46,7 @@ def _load_file(
     return o
 
 
-def load_from_folder(read_dir: str, files: list) -> list:
+def load_from_folder(read_dir: str, files: list, type: int = 0) -> list:
     """
     Load files from a given folder. Supports txt, pddl, json and pickle files.
 
@@ -58,6 +65,7 @@ def load_from_folder(read_dir: str, files: list) -> list:
                 join(read_dir, file_name),
                 load_ok=C.LOAD_OK_MSG.format(file_name, read_dir),
                 error=C.LOAD_ERROR_MSG.format(file_name, read_dir),
+                type=type,
             )
         )
     return to_return
